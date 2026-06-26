@@ -1,6 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -16,25 +15,19 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
 
 document.addEventListener("DOMContentLoaded", () => {
   const donorForm = document.getElementById("donorForm");
   const donorTableBody = document.querySelector("#donorTable tbody");
-  const verifySection = document.getElementById("verifySection");
   const visitorCount = document.getElementById("visitorCount");
 
   let serialCounter = 1;
-  let verifiedPhone = null;
 
   // Visitor counter
   let count = localStorage.getItem("visitorCount") || 0;
   count++;
   localStorage.setItem("visitorCount", count);
   visitorCount.textContent = count;
-
-  // Setup reCAPTCHA
-  window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", { size: "normal" });
 
   // Handle donor form submission
   donorForm.addEventListener("submit", async (e) => {
@@ -45,20 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const bloodGroup = document.getElementById("bloodGroup").value;
     const city = document.getElementById("city").value;
     const phone = document.getElementById("phone").value;
-
-    if (!verifiedPhone || verifiedPhone !== phone) {
-      // Send SMS verification
-      try {
-        const confirmationResult = await signInWithPhoneNumber(auth, phone, window.recaptchaVerifier);
-        window.confirmationResult = confirmationResult;
-        verifySection.style.display = "block";
-        alert("Verification code sent to " + phone);
-      } catch (err) {
-        console.error("SMS not sent:", err);
-        alert("Error: " + err.message);
-      }
-      return;
-    }
 
     // Save donor to Firestore
     try {
@@ -84,23 +63,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       serialCounter++;
       donorForm.reset();
-      verifiedPhone = null; // reset for next entry
     } catch (err) {
       console.error("Error adding donor:", err);
-    }
-  });
-
-  // Verify code
-  document.getElementById("verifyBtn").addEventListener("click", async () => {
-    const code = document.getElementById("verifyCode").value;
-    try {
-      const result = await window.confirmationResult.confirm(code);
-      verifiedPhone = result.user.phoneNumber;
-      alert("Phone verified! Now submit the form again to add donor.");
-      verifySection.style.display = "none";
-    } catch (err) {
-      console.error("Verification failed:", err);
-      alert("Verification failed: " + err.message);
+      alert("Error: " + err.message);
     }
   });
 
