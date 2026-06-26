@@ -1,0 +1,94 @@
+/* Reset some defaults */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  display: flex;
+  background-color: #f9f9f9;
+}
+
+/* Sidebar with ad */
+.sidebar {
+  width: 250px;
+  background-color: #eee;
+  padding: 15px;
+  border-right: 1px solid #ccc;
+}
+
+.sidebar img {
+  max-width: 100%;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+}
+
+/* Main content area */
+.content {
+  flex: 1;
+  padding: 20px;
+}
+
+h1 {
+  color: #b30000;
+  margin-top: 0;
+}
+
+.counter {
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+/* Donor form styling */
+form {
+  background: #fff;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+form label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+form input, form select {
+  padding: 6px;
+  width: 250px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+}
+
+form button {
+  background-color: #b30000;
+  color: #fff;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+form button:hover {
+  background-color: #800000;
+}
+
+/* Donor table styling */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  background: #fff;
+}
+
+table th {
+  background-color: #b30000;
+  color: #fff;
+  padding: 10px;
+  text-align: left;
+}
+
+table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+
+table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}

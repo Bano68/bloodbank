@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Blood Bank Website</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Sidebar with Ad -->
+  <div class="sidebar">
+    <img src="https://via.placeholder.com/250x150?text=Ad+Banner" alt="Ad">
+  </div>
+
+  <!-- Main Content -->
+  <div class="content">
+    <h1>Welcome to Blood Bank</h1>
+    <div class="counter">Visitors: <span id="visitorCount"></span></div>
+
+    <!-- Donor Form -->
+    <form id="donorForm">
+      <label>First Name: <input type="text" id="firstName" required></label><br><br>
+      <label>Last Name: <input type="text" id="lastName" required></label><br><br>
+      <label>Blood Group:
+        <select id="bloodGroup" required>
+          <option value="">Select</option>
+          <option>A+</option><option>A-</option>
+          <option>B+</option><option>B-</option>
+          <option>O+</option><option>O-</option>
+          <option>AB+</option><option>AB-</option>
+        </select>
+      </label><br><br>
+      <label>City: <input type="text" id="city" required></label><br><br>
+      <label>Phone: <input type="text" id="phone" required placeholder="+923001234567"></label><br><br>
+
+      <!-- reCAPTCHA container -->
+      <div id="recaptcha-container"></div>
+
+      <!-- Verification code field -->
+      <div id="verifySection" style="display:none;">
+        <label>Verification Code: <input type="text" id="verifyCode"></label><br><br>
+        <button type="button" id="verifyBtn">Verify Phone</button>
+      </div>
+
+      <button type="submit">Add Donor</button>
+    </form>
+
+    <!-- Donor Table -->
+    <table id="donorTable">
+      <thead>
+        <tr>
+          <th>Serial ID</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Blood Group</th>
+          <th>City</th>
+          <th>Phone</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Firebase + App Logic -->
+  <script src="script.js" type="module"></script>
+</body>
+</html>
