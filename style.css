@@ -1,61 +1,55 @@
+/* Apply medical.jpg as page background */
 body {
-  font-family: Arial, sans-serif;
   margin: 0;
-  padding: 0;
-  background: url('blood-donation.jpg') no-repeat center center fixed;
+  font-family: Arial, sans-serif;
+  background: url("medical.jpg") no-repeat center center fixed;
   background-size: cover;
 }
 
-.container {
-  background: rgba(255, 255, 255, 0.9);
-  margin: 50px auto;
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  float: left;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.9); /* light panel for ad */
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.sidebar img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+/* Main Content */
+.content {
+  margin-left: 270px; /* leaves space for sidebar */
   padding: 20px;
-  border-radius: 10px;
-  width: 80%;
-  max-width: 800px;
+  background: rgba(255, 255, 255, 0.85); /* semi-transparent white */
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
-h1 {
-  text-align: center;
-  color: #b30000;
-}
-
-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+/* Donor Form */
+#donorForm {
   margin-bottom: 20px;
 }
 
-form input, form button {
-  flex: 1 1 45%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-form button {
-  background: #b30000;
-  color: white;
-  cursor: pointer;
-}
-
-form button:hover {
-  background: #800000;
-}
-
-table {
+/* Donor Table */
+#donorTable {
   width: 100%;
   border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.9);
 }
 
-table th, table td {
+#donorTable th, #donorTable td {
   border: 1px solid #ccc;
   padding: 8px;
   text-align: center;
 }
 
-table th {
-  background: #b30000;
+#donorTable th {
+  background: rgba(220, 0, 0, 0.85);
   color: white;
 }
