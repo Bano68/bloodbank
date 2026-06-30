@@ -37,17 +37,26 @@ function renderDonorRow(donor) {
   donorTableBody.appendChild(row);
 }
 
-// Load existing donors
-(async () => {
-  const q = query(collection(db, "donors"), orderBy("serialId", "asc"));
-  const querySnapshot = await getDocs(q);
+// Load existing donors from Firestore
+async function loadDonors() {
+  try {
+    const q = query(collection(db, "donors"), orderBy("serialId", "asc"));
+    const querySnapshot = await getDocs(q);
 
-  querySnapshot.forEach((doc) => {
-    const donor = doc.data();
-    renderDonorRow(donor);
-    if (donor.serialId >= serialCounter) serialCounter = donor.serialId + 1;
-  });
-})();
+    donorTableBody.innerHTML = ""; // clear table before rendering
+    querySnapshot.forEach((doc) => {
+      const donor = doc.data();
+      renderDonorRow(donor);
+      if (donor.serialId >= serialCounter) serialCounter = donor.serialId + 1;
+    });
+  } catch (err) {
+    console.error("Error loading donors:", err);
+    alert("Error loading donors: " + err.message);
+  }
+}
+
+// Call loadDonors on page load
+loadDonors();
 
 // Handle form submission
 donorForm.addEventListener("submit", async (e) => {
@@ -74,7 +83,8 @@ donorForm.addEventListener("submit", async (e) => {
       phone
     });
 
-    renderDonorRow({ serialId: serialCounter, firstName, lastName, bloodGroup, city, phone });
+    // Refresh donor list after adding
+    loadDonors();
     serialCounter++;
     donorForm.reset();
   } catch (err) {
