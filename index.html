@@ -2,21 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blood Bank Donors</title>
+  <title>Blood Bank Website</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Blood Donors List</h1>
+  <!-- Sidebar with Ad -->
+  <div class="sidebar">
+    <img src="medical.jpg" alt="Medical Ad">
+  </div>
+
+  <!-- Main Content -->
+  <div class="content">
+    <h1>Welcome to Blood Bank</h1>
+    <div class="counter">Visitors: <span id="visitorCount"></span></div>
 
     <!-- Donor Form -->
     <form id="donorForm">
-      <input type="text" id="firstName" placeholder="First Name" required>
-      <input type="text" id="lastName" placeholder="Last Name" required>
-      <input type="text" id="bloodGroup" placeholder="Blood Group" required>
-      <input type="text" id="city" placeholder="City" required>
-      <input type="text" id="phone" placeholder="Phone Number" required>
+      <label>First Name: <input type="text" id="firstName" required></label><br><br>
+      <label>Last Name: <input type="text" id="lastName" required></label><br><br>
+      <label>Blood Group:
+        <select id="bloodGroup" required>
+          <option value="">Select</option>
+          <option>A+</option><option>A-</option>
+          <option>B+</option><option>B-</option>
+          <option>O+</option><option>O-</option>
+          <option>AB+</option><option>AB-</option>
+        </select>
+      </label><br><br>
+      <label>City: <input type="text" id="city" required></label><br><br>
+      <label>Phone: <input type="text" id="phone" required placeholder="+923001234567"></label><br><br>
+
       <button type="submit">Add Donor</button>
     </form>
 
@@ -24,7 +39,7 @@
     <table id="donorTable">
       <thead>
         <tr>
-          <th>Serial</th>
+          <th>Serial ID</th>
           <th>First Name</th>
           <th>Last Name</th>
           <th>Blood Group</th>
@@ -36,6 +51,7 @@
     </table>
   </div>
 
-  <script type="module" src="app.js"></script>
+  <!-- App Logic -->
+  <script src="script.js" type="module"></script>
 </body>
 </html>
