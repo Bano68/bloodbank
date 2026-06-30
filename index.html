@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blood Bank Donors</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Blood Donors List</h1>
+
+    <!-- Donor Form -->
+    <form id="donorForm">
+      <input type="text" id="firstName" placeholder="First Name" required>
+      <input type="text" id="lastName" placeholder="Last Name" required>
+      <input type="text" id="bloodGroup" placeholder="Blood Group" required>
+      <input type="text" id="city" placeholder="City" required>
+      <input type="text" id="phone" placeholder="Phone Number" required>
+      <button type="submit">Add Donor</button>
+    </form>
+
+    <!-- Donor Table -->
+    <table id="donorTable">
+      <thead>
+        <tr>
+          <th>Serial</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Blood Group</th>
+          <th>City</th>
+          <th>Phone</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
