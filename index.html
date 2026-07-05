@@ -14,7 +14,32 @@
   <!-- Main Content -->
   <div class="content">
     <h1>Welcome to Blood Bank</h1>
-    <div class="counter">Visitors: <span id="visitorCount"></span></div>
+
+    <!-- Visitors Counter with Loader -->
+    <div class="counter">
+      Visitors: 
+      <span id="visitorCount" class="hidden"></span>
+      <div id="visitorLoader" class="loader"></div>
+    </div>
+
+    <!-- Donor Table with Loader -->
+    <div id="tableLoader" class="loading-container">
+      <div class="loader"></div>
+    </div>
+
+    <table id="donorTable" class="hidden">
+      <thead>
+        <tr>
+          <th>Serial ID</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Blood Group</th>
+          <th>City</th>
+          <th>Phone</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
 
     <!-- Donor Form -->
     <form id="donorForm">
@@ -34,21 +59,6 @@
 
       <button type="submit">Add Donor</button>
     </form>
-
-    <!-- Donor Table -->
-    <table id="donorTable">
-      <thead>
-        <tr>
-          <th>Serial ID</th>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Blood Group</th>
-          <th>City</th>
-          <th>Phone</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
   </div>
 
   <!-- App Logic -->
