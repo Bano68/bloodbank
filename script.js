@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         `Desktop visitors: ${data.desktop} | Mobile visitors: ${data.mobile}`;
     });
   } catch (err) {
-    console.error(err);
+    console.error("Visitor counter error:", err);
   }
 
   // =============================
@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       donorForm.reset();
       alert("Donor Added Successfully");
     } catch (err) {
-      console.error(err);
+      console.error("Add donor error:", err);
       alert(err.message);
     }
   });
@@ -141,6 +141,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       snapshot.forEach((document) => {
         const donor = document.data();
+        console.log("Loaded donor:", donor);
 
         if (donor.serialId >= serialCounter) {
           serialCounter = donor.serialId + 1;
