@@ -22,6 +22,25 @@
       <div id="visitorLoader" class="loader"></div>
     </div>
 
+    <!-- Donor Form (moved above table) -->
+    <form id="donorForm">
+      <label>First Name: <input type="text" id="firstName" required></label><br><br>
+      <label>Last Name: <input type="text" id="lastName" required></label><br><br>
+      <label>Blood Group:
+        <select id="bloodGroup" required>
+          <option value="">Select</option>
+          <option>A+</option><option>A-</option>
+          <option>B+</option><option>B-</option>
+          <option>O+</option><option>O-</option>
+          <option>AB+</option><option>AB-</option>
+        </select>
+      </label><br><br>
+      <label>City: <input type="text" id="city" required></label><br><br>
+      <label>Phone: <input type="text" id="phone" required placeholder="+923001234567"></label><br><br>
+
+      <button type="submit">Add Donor</button>
+    </form>
+
     <!-- Donor Table with Loader -->
     <div id="tableLoader" class="loading-container">
       <div class="loader"></div>
@@ -40,25 +59,6 @@
       </thead>
       <tbody></tbody>
     </table>
-
-    <!-- Donor Form -->
-    <form id="donorForm">
-      <label>First Name: <input type="text" id="firstName" required></label><br><br>
-      <label>Last Name: <input type="text" id="lastName" required></label><br><br>
-      <label>Blood Group:
-        <select id="bloodGroup" required>
-          <option value="">Select</option>
-          <option>A+</option><option>A-</option>
-          <option>B+</option><option>B-</option>
-          <option>O+</option><option>O-</option>
-          <option>AB+</option><option>AB-</option>
-        </select>
-      </label><br><br>
-      <label>City: <input type="text" id="city" required></label><br><br>
-      <label>Phone: <input type="text" id="phone" required placeholder="+923001234567"></label><br><br>
-
-      <button type="submit">Add Donor</button>
-    </form>
   </div>
 
   <!-- App Logic -->
