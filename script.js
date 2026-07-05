@@ -1,7 +1,17 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { 
-  getFirestore, collection, doc, getDoc, setDoc, updateDoc, increment,
-  addDoc, getDocs, query, orderBy, where, onSnapshot
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  increment,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // Firebase config
@@ -30,19 +40,23 @@ function getDeviceType() {
 
 document.addEventListener("DOMContentLoaded", async () => {
   const visitorCount = document.getElementById("visitorCount");
+  const visitorLoader = document.getElementById("visitorLoader");
   const donorForm = document.getElementById("donorForm");
   const donorTableBody = document.querySelector("#donorTable tbody");
+  const donorTable = document.getElementById("donorTable");
+  const tableLoader = document.getElementById("tableLoader");
 
   let serialCounter = 1;
 
-  // -------------------
-  // Global Visitor Counter
-  // -------------------
+  // =============================
+  // Visitor Counter
+  // =============================
   const deviceType = getDeviceType();
   const visitorsDocRef = doc(collection(db, "visitors"), "counts");
 
   try {
     const docSnap = await getDoc(visitorsDocRef);
+
     if (!docSnap.exists()) {
       await setDoc(visitorsDocRef, { desktop: 0, mobile: 0 });
     }
@@ -53,62 +67,52 @@ document.addEventListener("DOMContentLoaded", async () => {
       await updateDoc(visitorsDocRef, { desktop: increment(1) });
     }
 
-    // Real-time listener for visitor counts
     onSnapshot(visitorsDocRef, (snap) => {
       const data = snap.data();
-      visitorCount.textContent = `Desktop visitors: ${data.desktop} | Mobile visitors: ${data.mobile}`;
+
+      // Hide loader, show count
+      visitorLoader.classList.add("hidden");
+      visitorCount.classList.remove("hidden");
+
+      visitorCount.textContent =
+        `Desktop visitors: ${data.desktop} | Mobile visitors: ${data.mobile}`;
     });
   } catch (err) {
-    console.error("Error updating visitor count:", err);
-    visitorCount.textContent = "Error loading visitor count";
+    console.error(err);
   }
 
-  // -------------------
-  // Donor Table Logic
-  // -------------------
-  function renderDonorRow(donor) {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${donor.serialId}</td>
-      <td>${donor.firstName}</td>
-      <td>${donor.lastName}</td>
-      <td>${donor.bloodGroup}</td>
-      <td>${donor.city}</td>
-      <td>${donor.phone}</td>
-    `;
-    donorTableBody.insertBefore(row, donorTableBody.firstChild);
-  }
-
+  // =============================
+  // Add Donor
+  // =============================
   donorForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const firstName = document.getElementById("firstName").value.trim();
     const lastName = document.getElementById("lastName").value.trim();
-    const bloodGroup = document.getElementById("bloodGroup").value.trim();
+    const bloodGroup = document.getElementById("bloodGroup").value;
     const city = document.getElementById("city").value.trim();
     const phone = document.getElementById("phone").value.trim();
 
     if (!firstName || !lastName || !bloodGroup || !city || !phone) {
-      alert("Please fill in all fields.");
+      alert("Please fill all fields.");
       return;
     }
 
     const phonePattern = /^\+92\d{10}$/;
     if (!phonePattern.test(phone)) {
-      alert("Phone number must be in format +923001234567");
+      alert("Phone number must be like +923001234567");
       return;
     }
 
     try {
-      // Check duplicate phone
       const q = query(collection(db, "donors"), where("phone", "==", phone));
       const snapshot = await getDocs(q);
+
       if (!snapshot.empty) {
-        alert("This phone number is already registered.");
+        alert("Phone number already registered.");
         return;
       }
 
-      // Save donor
       await addDoc(collection(db, "donors"), {
         serialId: serialCounter,
         firstName,
@@ -120,20 +124,47 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       serialCounter++;
       donorForm.reset();
+      alert("Donor Added Successfully");
     } catch (err) {
-      console.error("Error adding donor:", err);
-      alert("Error: " + err.message);
+      console.error(err);
+      alert(err.message);
     }
   });
 
-  // Real-time donor list
-  const donorQuery = query(collection(db, "donors"), orderBy("serialId", "asc"));
-  onSnapshot(donorQuery, (snapshot) => {
-    donorTableBody.innerHTML = "";
-    snapshot.forEach((doc) => {
-      const donor = doc.data();
-      renderDonorRow(donor);
-      if (donor.serialId >= serialCounter) serialCounter = donor.serialId + 1;
-    });
-  });
+  // =============================
+  // Read Donors (Realtime)
+  // =============================
+  onSnapshot(
+    collection(db, "donors"),
+    (snapshot) => {
+      donorTableBody.innerHTML = "";
+
+      snapshot.forEach((document) => {
+        const donor = document.data();
+
+        if (donor.serialId >= serialCounter) {
+          serialCounter = donor.serialId + 1;
+        }
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${donor.serialId}</td>
+          <td>${donor.firstName}</td>
+          <td>${donor.lastName}</td>
+          <td>${donor.bloodGroup}</td>
+          <td>${donor.city}</td>
+          <td>${donor.phone}</td>
+        `;
+        donorTableBody.appendChild(row);
+      });
+
+      // Hide loader, show table
+      tableLoader.classList.add("hidden");
+      donorTable.classList.remove("hidden");
+    },
+    (error) => {
+      console.error("Firestore Read Error:", error);
+      alert(error.message);
+    }
+  );
 });
