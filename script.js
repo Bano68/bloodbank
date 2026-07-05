@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -16,12 +16,20 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// Loader helpers
+function showLoader(loaderId, contentId) {
+  document.getElementById(loaderId).style.display = "block";
+  document.getElementById(contentId).classList.add("hidden");
+}
+function hideLoader(loaderId, contentId) {
+  document.getElementById(loaderId).style.display = "none";
+  document.getElementById(contentId).classList.remove("hidden");
+}
+
 // Detect device type
 function getDeviceType() {
   const ua = navigator.userAgent.toLowerCase();
-  if (/mobile|android|iphone|ipad|tablet/.test(ua)) {
-    return "mobile";
-  }
+  if (/mobile|android|iphone|ipad|tablet/.test(ua)) return "mobile";
   return "desktop";
 }
 
@@ -29,24 +37,27 @@ document.addEventListener("DOMContentLoaded", () => {
   const donorForm = document.getElementById("donorForm");
   const donorTableBody = document.querySelector("#donorTable tbody");
   const visitorCount = document.getElementById("visitorCount");
-  const membersCount = document.getElementById("membersCount"); // ✅ new element for members count
+  const membersCount = document.getElementById("membersCount");
 
   let serialCounter = 1;
 
-  // Visitor counter (local storage)
-  const deviceType = getDeviceType();
-  const key = deviceType === "mobile" ? "visitorCountMobile" : "visitorCountDesktop";
+  // ✅ Visitors counter with loader
+  showLoader("visitorLoader", "visitorCount");
+  setTimeout(() => {
+    const deviceType = getDeviceType();
+    const key = deviceType === "mobile" ? "visitorCountMobile" : "visitorCountDesktop";
+    let count = parseInt(localStorage.getItem(key)) || 0;
+    count++;
+    localStorage.setItem(key, count);
 
-  let count = parseInt(localStorage.getItem(key)) || 0;
-  count++;
-  localStorage.setItem(key, count);
+    const desktopCount = localStorage.getItem("visitorCountDesktop") || 0;
+    const mobileCount = localStorage.getItem("visitorCountMobile") || 0;
+    visitorCount.textContent = `Desktop visitors: ${desktopCount} | Mobile visitors: ${mobileCount}`;
 
-  // Show both counters
-  const desktopCount = localStorage.getItem("visitorCountDesktop") || 0;
-  const mobileCount = localStorage.getItem("visitorCountMobile") || 0;
-  visitorCount.textContent = `Desktop visitors: ${desktopCount} | Mobile visitors: ${mobileCount}`;
+    hideLoader("visitorLoader", "visitorCount");
+  }, 800); // simulate loading
 
-  // Function to render donor row (insert at top)
+  // ✅ Render donor row
   function renderDonorRow(donor) {
     const row = document.createElement("tr");
     row.innerHTML = `
@@ -60,10 +71,9 @@ document.addEventListener("DOMContentLoaded", () => {
     donorTableBody.insertBefore(row, donorTableBody.firstChild);
   }
 
-  // Handle donor form submission
+  // ✅ Handle donor form submission
   donorForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-
     const firstName = document.getElementById("firstName").value.trim();
     const lastName = document.getElementById("lastName").value.trim();
     const bloodGroup = document.getElementById("bloodGroup").value.trim();
@@ -76,21 +86,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      // Check if phone already exists
+      // Check duplicates
       const existingSnapshot = await getDocs(collection(db, "donors"));
       let duplicate = false;
       existingSnapshot.forEach((doc) => {
-        if (doc.data().phone === phone) {
-          duplicate = true;
-        }
+        if (doc.data().phone === phone) duplicate = true;
       });
-
       if (duplicate) {
         alert("This phone number is already registered.");
         return;
       }
 
-      // Save donor to Firestore
+      // Save donor
       await addDoc(collection(db, "donors"), {
         serialId: serialCounter,
         firstName,
@@ -100,47 +107,29 @@ document.addEventListener("DOMContentLoaded", () => {
         phone
       });
 
-      renderDonorRow({ serialId: serialCounter, firstName, lastName, bloodGroup, city, phone });
-
       serialCounter++;
       donorForm.reset();
-
-      // ✅ Update members count after adding new donor
-      updateMembersCount();
     } catch (err) {
       console.error("Error adding donor:", err);
       alert("Error: " + err.message);
     }
   });
 
-  // Load existing donors oldest-first
-  (async () => {
-    try {
-      const q = query(collection(db, "donors"), orderBy("serialId", "asc"));
-      const querySnapshot = await getDocs(q);
+  // ✅ Donor table loader + real-time updates
+  showLoader("tableLoader", "donorTable");
+  const q = query(collection(db, "donors"), orderBy("serialId", "asc"));
+  onSnapshot(q, (querySnapshot) => {
+    donorTableBody.innerHTML = ""; // clear table before re-render
+    querySnapshot.forEach((doc) => {
+      const donor = doc.data();
+      renderDonorRow(donor);
+      if (donor.serialId >= serialCounter) serialCounter = donor.serialId + 1;
+    });
+    hideLoader("tableLoader", "donorTable");
+  });
 
-      querySnapshot.forEach((doc) => {
-        const donor = doc.data();
-        renderDonorRow(donor);
-        if (donor.serialId >= serialCounter) serialCounter = donor.serialId + 1;
-      });
-
-      // ✅ Show members count on page load
-      updateMembersCount();
-    } catch (err) {
-      console.error("Error loading donors:", err);
-      alert("Error loading donors: " + err.message);
-    }
-  })();
-
-  // ✅ Function to update members count from Firestore
-  async function updateMembersCount() {
-    try {
-      const snapshot = await getDocs(collection(db, "donors"));
-      membersCount.textContent = `Total Members: ${snapshot.size}`;
-    } catch (err) {
-      console.error("Error fetching members count:", err);
-      membersCount.textContent = "Error loading members count";
-    }
-  }
+  // ✅ Real-time members count
+  onSnapshot(collection(db, "donors"), (snapshot) => {
+    membersCount.textContent = `Total Members: ${snapshot.size}`;
+  });
 });
