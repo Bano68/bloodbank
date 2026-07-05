@@ -1,5 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { 
+  getFirestore, collection, addDoc, getDocs, query, orderBy, onSnapshot,
+  doc, getDoc, setDoc, updateDoc, increment
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -41,21 +44,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let serialCounter = 1;
 
-  // ✅ Visitors counter with loader
+  // ✅ Global Visitors counter with Firestore
   showLoader("visitorLoader", "visitorCount");
-  setTimeout(() => {
-    const deviceType = getDeviceType();
-    const key = deviceType === "mobile" ? "visitorCountMobile" : "visitorCountDesktop";
-    let count = parseInt(localStorage.getItem(key)) || 0;
-    count++;
-    localStorage.setItem(key, count);
+  (async () => {
+    try {
+      const deviceType = getDeviceType();
+      const visitorsDocRef = doc(collection(db, "visitors"), "counts");
 
-    const desktopCount = localStorage.getItem("visitorCountDesktop") || 0;
-    const mobileCount = localStorage.getItem("visitorCountMobile") || 0;
-    visitorCount.textContent = `Desktop visitors: ${desktopCount} | Mobile visitors: ${mobileCount}`;
+      // Ensure document exists
+      const docSnap = await getDoc(visitorsDocRef);
+      if (!docSnap.exists()) {
+        await setDoc(visitorsDocRef, { desktop: 0, mobile: 0 });
+      }
 
-    hideLoader("visitorLoader", "visitorCount");
-  }, 800); // simulate loading
+      // Increment correct counter
+      if (deviceType === "mobile") {
+        await updateDoc(visitorsDocRef, { mobile: increment(1) });
+      } else {
+        await updateDoc(visitorsDocRef, { desktop: increment(1) });
+      }
+
+      // Real-time listener for visitors
+      onSnapshot(visitorsDocRef, (snap) => {
+        const data = snap.data();
+        const total = (data.desktop || 0) + (data.mobile || 0);
+        visitorCount.textContent = 
+          `Desktop visitors: ${data.desktop} | Mobile visitors: ${data.mobile} | Total visitors: ${total}`;
+        hideLoader("visitorLoader", "visitorCount");
+      });
+    } catch (err) {
+      console.error("Error updating visitor count:", err);
+      visitorCount.textContent = "Error loading visitor count";
+      hideLoader("visitorLoader", "visitorCount");
+    }
+  })();
 
   // ✅ Render donor row
   function renderDonorRow(donor) {
