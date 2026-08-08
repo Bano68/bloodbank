@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
   (async () => {
     try {
       const deviceType = getDeviceType();
-      const visitorsDocRef = doc(db, "visitors", "counts"); // FIXED
+      const visitorsDocRef = doc(collection(db, "visitors"), "counts");
 
       // Ensure document exists
       const docSnap = await getDoc(visitorsDocRef);
